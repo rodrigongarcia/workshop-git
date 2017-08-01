@@ -1,6 +1,6 @@
 \documentclass{beamer}
 \usepackage{beamerthemeshadow}
-\usepackage[spanish]{babel}
+%\usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{multicol}
 
@@ -21,7 +21,7 @@
 
 \begin{document}
 \title{Workshop de Git}  
-\author{Iván Badgen, Pablo Rago}
+\author{Ing. Rodrigo García}
 \institute{Despegar.com}
 \date{\today} 
 
@@ -57,7 +57,7 @@
 \begin{frame}[fragile]{Instalando...} 
   \begin{block}{}
       \begin{itemize}
-      \item Ubuntu (Linux): \$ sudo apt-get install git \pause
+      \item Ubuntu (Linux): \$ sudo apt install git \pause
 	\item	 Windows: \begin{itemize}
 			\item Página oficial: \url{http://git-scm.com/download/win} 
 			\item Link alternativo: \url{http://code.google.com/p/msysgit/downloads/list?can=3}
@@ -113,7 +113,7 @@ $ git config --global user.email "jperez@despegar.com"
     \item \$ mkdir -p  $\sim$/.ssh/ \pause 
     \item \$ cd $\sim$/.ssh/ \pause 
     \item \$ ssh-keygen -C jperez@despegar.com -f id\_desp\_rsa \pause 
-    \item Ir a \url{http://gitorious.despegar.it/~tu\_usuario/keys} y pegar la clave generada en id\_desp\_rsa.pub
+    \item Ir a \url{https://github.com/settings/keys} y agregar la clave generada en id\_desp\_rsa.pub
   \end{itemize}
   \end{block}
   
@@ -127,7 +127,7 @@ $ git config --global user.email "jperez@despegar.com"
     \item Reemplazar en Key comment el tu\_usuario@despegar.com. \pause 
     \item Guardar las constraseñas generadas. (tanto la pública como la privada) \pause 
     \item Copiar la clave que se generó (Public key for pasting into OpenSHH...). \pause 
-    \item Ir a \url{http://gitorious.despegar.it/~tu\_usuario/keys} y pegar la clave generada con putty key generator.
+    \item Ir a \url{https://github.com/settings/keys} y pegar la clave generada con putty key generator.
   \end{enumerate}
 
   \end{block}
@@ -171,19 +171,19 @@ $ git config --global user.email "jperez@despegar.com"
 \begin{frame}[fragile]{Comandos}
   \begin{block}{Inicializar repositorio}
     \begin{verbatim}
+  $ echo "#test" >> README.md
   $ git init
-  $ git remote add origin <remoto>
-  $ git add .
-  $ git commit -m "Estado inicial"
+  $ git add README.md
+  $ git commit -m "First commit"
+  $ git remote add \
+  		origin git@github.com:<user>/<my-repo>.git
+  $ git push -u origin master
     \end{verbatim}
   \end{block} \pause
   
   \begin{block}{Clonar repositorio remoto (configura automáticamente el orígen)}
     \begin{verbatim}
-  # ssh (para poder hacer push)
-  $ git clone git@gitorious.despegar.it:ejemplo.git
-  # git (read-only)
-  $ git clone git://gitorious.despegar.it:ejemplo.git
+  $ git clone git@github.com:<user>/<my-repo>.git
     \end{verbatim}
   \end{block}
   
@@ -193,7 +193,7 @@ $ git config --global user.email "jperez@despegar.com"
   \begin{block}{Crear ramas}
     \begin{verbatim}
   $ git branch <nombre> 
-    #Crear la rama en el punto actual.                 
+    # Crear la rama en el punto actual.                 
     # Es necesario hacer checkout a la misma.
   $ git branch <nombre> <COMMIT>    
     # Crea la rama a partir del commit dado. 
@@ -283,17 +283,14 @@ $ git push <REMOTE> <RAMA>
   \begin{block}{Configuración}
       \begin{verbatim}
   $ vim ~/.gitconfig
-	
-[merge]
-  tool = diffmerge
-[mergetool "diffmerge"]
-  cmd = diffmerge --merge --result=$MERGED \ 
-    $BASE $LOCAL $REMOTE
-  trustExitCode = false
-[diff]
-  tool = diffmerge
-[difftool "diffmerge"]
-  cmd = diffmerge $LOCAL $REMOTE
+  [merge]
+    tool = meldMerge
+  [mergetool "meldMerge"]
+    cmd = meld --diff $LOCAL $MERGED $REMOTE
+  [diff]
+    tool = meldDiff
+  [difftool "meldDiff"]
+    cmd = meld --diff $LOCAL $REMOTE
       \end{verbatim}
   \end{block}
 
@@ -303,6 +300,7 @@ $ git push <REMOTE> <RAMA>
 
   \begin{block}{Ejecución}
       \begin{verbatim}
+  $ git difftool
   $ git mergetool
       \end{verbatim}
   \end{block} \pause
@@ -310,12 +308,14 @@ $ git push <REMOTE> <RAMA>
   \begin{block}{Herramientas}
     Algunas opciones:
       \begin{itemize}
-       \item diffmerge \pause
-       \item Meld \pause
-       \item Beyond Compare \pause
-       \item etc...
-      \end{itemize}
-
+       \item Meld
+       \item Beyond Compare
+      \end{itemize}\pause
+	Mas completas:
+      \begin{itemize}
+       \item gitk
+       \item GitKraken
+      \end{itemize}	
   \end{block}
   
 \end{frame}

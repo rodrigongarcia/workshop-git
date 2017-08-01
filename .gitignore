@@ -28,3 +28,5 @@
 *.pdf
 *.backup
 *.tex~
+*.swp
+*.fls
