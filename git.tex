@@ -61,7 +61,7 @@
 	\item	 Windows: \begin{itemize}
 			\item Página oficial: \url{http://git-scm.com/download/win} 
 			\item Link alternativo: \url{http://code.google.com/p/msysgit/downloads/list?can=3}
-			\item Tortoise Git: \url{http://code.google.com/p/tortoisegit/}
+		\item Tortoise Git: \url{http://code.google.com/p/tortoisegit/}
 			\item \textbf{Importante:} al instalar, poner la opción putty y no openSSH.
 		      \end{itemize} \pause
       \item Mac: \url{http://git-scm.com/download/mac} \pause
@@ -192,40 +192,41 @@ $ git config --global user.email "jperez@despegar.com"
 \begin{frame}[fragile]{Comandos (2)}
   \begin{block}{Crear ramas}
     \begin{verbatim}
-  $ git branch <nombre> 
+  $ git branch <RAMA> && git checkout <RAMA>
     # Crear la rama en el punto actual.                 
     # Es necesario hacer checkout a la misma.
-  $ git branch <nombre> <COMMIT>    
-    # Crea la rama a partir del commit dado. 
-    # Es necesario hacer checkout.
-  $ git checkout -b <nombre>  
+  $ git checkout -b <RAMA>  
     # Crear rama en el punto actual y hacerle checkout.
-  $ git checkout -b <nombre> <COMMIT>   
-    # Crear la rama a partir del commit dado 
-    # y hacerle checkout.
-  $ git branch -m <actual> <nuevo>  
-    # Renombrar la rama.
+  $ echo "# <nombre>" >> <nombre>.md
+    # Crear un nuevo archivo.
+  $ git add <nombre>.md
+    # Agregamos al registro.
+  $ git status
+    # Verificamos el estado del repo local.
     \end{verbatim}
   \end{block}
 \end{frame}
 
 \begin{frame}[fragile]{Comandos (3)}
-  \begin{block}{Moverse a una rama o a un commit específico}
+  \begin{block}{Commit sobre la rama}
     \begin{verbatim}
-  $ git checkout <RAMA|COMMIT>
-    # No toca los cambios locales
-  $ git checkout -f <RAMA|COMMIT>
-    # Sobreescribe los cambios locales
+  $ git commit -m "Agregar buen mensaje"
+    # Realizamos el commit de los cambios.
+  $ git log
+    # Ver los cambios realizados.
     \end{verbatim}
   \end{block} \pause
   
-  \begin{block}{Merge de ramas}
+  \begin{block}{Subiendo la rama local}
     \begin{verbatim}
-  $ git merge <RAMA>
-    # Fusiona la rama indicada en la rama actual
-    \end{verbatim}    
-    Las diferencias se resuelven automáticamente si es posible. En caso de conflictos,
-    el proceso se detiene (merging) a la espera de una resolución manual.
+$ git push origin <RAMA>
+  # Subimos el estado de nuestro repo al repo remoto
+$ git checkout -b merging && git merge <RAMA>
+  # Vamos a la rama merging, luego hacemos un 
+  merge de la rama, Las diferencias se resuelven 
+  automáticamente si es posible. En caso de conflictos,
+  el proceso se detiene (merging) es necesario manual.
+  \end{verbatim}
   \end{block}
 \end{frame}
 
@@ -233,47 +234,20 @@ $ git config --global user.email "jperez@despegar.com"
 
 \begin{frame}[fragile]{Conflictos... conflictos everywhere}
 
-  \begin{block}{Resolver conflictos por consola}
+  \begin{block}{Resolver conflictos}
     \begin{verbatim}
-$ git status                       
-  # Muestra la situación actual del merge
-$ git diff                         
+$ git push origin merging
+  # Intentamos subir todos los cambios...
+$ git pull && git status
+  # Traemos y vemos la situación actual del merge
+$ git mergetool
   # Muestra los conflictos y las diferencias
-$ git add <file>                   
-  # Marca el archivo como mergeado
-$ git rm <file>                    
-  # Marca el archivo como eliminado 
-  #  en la revisión definitiva
+  # Si es que configuramos un mergetool...
     \end{verbatim}
-
   \end{block}
   \begin{figure}
     \includegraphics[scale=0.15]{everywhere.jpg} 
   \end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{Conflictos (2)}
-
-  \begin{block}{Tomar o dejar cambios}
-    \begin{verbatim}
-$ git checkout --ours -- <file> # Tomar el mío
-$ git checkout --theirs -- <file> # Tomar el remoto
-$ git reset --hard HEAD            
-  # Abortar el proceso y volver a la anterior
-$ git reset --hard ORIG_HEAD       
-  # Deshacer si ya se había confirmado con git commit
-    \end{verbatim}
-
-  \end{block} \pause
-  
-  \begin{block}{Confirmando}
-   \begin{verbatim}
-# Confirmamos
-$ git commit
-$ git push <REMOTE> <RAMA>
-   \end{verbatim}
-  \end{block}
-
 \end{frame}
 
 \subsection{Conflictos con mergetool}
@@ -367,27 +341,110 @@ $ git push origin :<rama>
 
 \subsection{Buenas practicas}
 
-\begin{frame}{Buenas practicas}
-   \begin{figure}
-    \includegraphics[height=170px, width=260px]{branch-model.png} 
-    \caption{El esquema de branches que manejamos. \url{http://nvie.com/posts/a-successful-git-branching-model/}}
-  \end{figure}
+%   \begin{figure}
+%    \includegraphics[height=170px, width=260px]{branch-model.png} 
+%	\url{ http://nvie.com/posts/a-successful-git-branching-model/}
+%  \end{figure}
+
+\begin{frame}{Main Branches}
+\begin{figure}
+	\begin{minipage}{0.3\textwidth}
+		\includegraphics[scale=0.20,left]{main-branches.png}
+	\end{minipage}
+\begin{minipage}{0.6\textwidth}\raggedright
+\begin{itemize}
+  \item Se conocen como nuestras ramas maestras.
+  \item Master es siempre nuestra rama productiva.
+  \item Develop es la rama de integración, donde podemos trabajar tranquilos. Sabemos que puede no estar estable.
+  \item En un equipo grande quizás nos falte algo mas.
+\end{itemize}	
+\end{minipage}
+\end{figure}
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Buenas practicas}
+\begin{frame}{Support Branches - Featured branches}
+\begin{figure}
+	\begin{minipage}{0.3\textwidth}
+		\includegraphics[scale=0.20,left]{fb.png}
+	\end{minipage}
+\begin{minipage}{0.6\textwidth}\raggedright
+\begin{itemize}
+  \item Se conocen como ramas de soporte.
+  \item Nos permite desarrollar nuevos cambios sin afectar la rama develop.
+  \item La creamos: git checkout -b myfeature develop.
+  \item Luego de terminar volvemos a develop: git checkout develop.
+  \item Integramos la rama feature en develop:  git merge --no-ff myfeature
+\end{itemize}
+\end{minipage}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Importancia de usar --no-ff}
+\begin{figure}
+	\begin{minipage}{0.35\textwidth}
+		\includegraphics[scale=0.15,left]{merge-without-ff.png}
+	\end{minipage}
+\begin{minipage}{0.6\textwidth}\raggedright
+\begin{itemize}
+  \item El flag --no-ff, nos permite integrar los cambios en un nuevo commit.
+  \item Sin el flag no podríamos identificar fácilmente los cambios del feature.
+  \item En caso de necesitar volver atrás los cambios mergeados es mas fácil.
+\end{itemize}
+\end{minipage}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Support Branches - Release branches}
+\begin{figure}
+	\begin{minipage}{0.3\textwidth}
+		\includegraphics[scale=0.50,left]{rb.jpg}
+	\end{minipage}
+\begin{minipage}{0.6\textwidth}\raggedright
+\begin{itemize}
+  \item Release branches nos permiten preparar un despliegue en producción: git checkout -b release-1.0 develop
+  \item Solo deberíamos realizara pequeños bugfix.
+  \item Cada pequeño bugfix podemos integrarlo en develop.
+  \item Utilizando github se realiza un pull request.
+  \item Sin github es podria hacerse en merge en master (usar --no-ff)
+\end{itemize}
+\end{minipage}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Support Branches - Hotfix branches}
+\begin{figure}
+	\begin{minipage}{0.3\textwidth}
+		\includegraphics[scale=0.15,left]{hotfix-branches.png}
+	\end{minipage}
+\begin{minipage}{0.6\textwidth}\raggedright
+\begin{itemize}
+  \item Murio prod!!! rajemo!!!.
+  \item No, usamos una hotfix branch.
+  \item La creamos: git checkout -b hotfix-1.2.1 master
+  \item Arreglamos el problema podemos subir a master.
+  \item git checkout master \&\& git merge --no-ff hotfix-1.2.1
+  \item No olvidarse de hacer el tag: git tag -a 1.2.1 -m "hotfix de prod"
+\end{itemize}
+\end{minipage}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Sino hay tabla}
 	\begin{figure}
 		\begin{minipage}{0.3\textwidth}
 			\includegraphics[scale=0.15,left]{80a.png}
 		\end{minipage}
-	\begin{minipage}{0.6\textwidth}\raggedright
+	\begin{minipage}{0.68\textwidth}\raggedright
     \begin{itemize}
       \item Commit sin comentarios, hay tabla.
 	  \item Features en el master, hay tabla.
 	  \item Hotfix en el master, hay tabla.	  
-	  \item git reset <commit> sobre commit publico, hay tabla.
+	  \item "git add ." con conflictos de merge, hay tabla.
+	  \item git merge sin usar flag --no-ff, hay tabla.
+	  \item merge directo sobre el master sin pull request, hay tabla.
+	  \item git reset sobre commit publico, hay tabla.
 	  \item commit --amed sobre commit publico, hay tabla.
 	  \item rebase sobre rama publica, hay tabla.
-	  \item merge directo sobre el master sin pull request, hay tabla.
     \end{itemize}	
     \end{minipage}
 	\end{figure}
@@ -401,16 +458,17 @@ $ git push origin :<rama>
   $ git tag
     \end{verbatim}
   \end{block} 
-  \pause
+
   \begin{block}{Crear un tag}
     \begin{verbatim}
   $ git tag -a v1.4 -m "creando el tag 1.4"
     \end{verbatim}
   \end{block}
-  \pause
+
   \begin{block}{Eliminarlo}
     \begin{verbatim}
   $ git push origin :refs/tags/v1.4
+  #Evitar eliminar un tag productivo.
     \end{verbatim}
   \end{block}
   \footnotetext{Para más información: \url{http://git-scm.com/book/en/Git-Basics-Tagging}}
@@ -453,16 +511,6 @@ $ git push origin :<rama>
       y escribir adentro los nombres de archivos o carpetas que queremos ignorar. Si queremos que aplique a todo el repositorio, lo ponemos en la raíz.
       Si es más específico pueden agregarse múltiples en diferentes carpetas. Algo importante es nunca poner .gitignore adentro ya que el .gitignore en
       sí mismo debe ser commiteado para que afecte a todos los que utilizan el repositorio.
-  \end{block}
-
-\end{frame}
-
-\subsection{Svn2Git}
-
-\begin{frame}{Svn2Git}
-  \begin{block}{}
-      Svn2Git es una herramienta open-source que nos sirve para migrar un repositorio svn a git, sin perder el historial.
-      Para descarga y documentación: \url{https://github.com/nirvdrum/svn2git/}
   \end{block}
 
 \end{frame}
